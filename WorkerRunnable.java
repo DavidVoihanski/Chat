@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.Socket;
 
 import javax.swing.JTextArea;
@@ -20,34 +21,38 @@ public class WorkerRunnable implements Runnable{
 	private ObjectOutputStream output;
 	private ObjectInputStream input;
 	private JTextArea chatWindow;
-	private JTextField userText;
+	private ServerSocket server;
 
-	public WorkerRunnable(Socket clientSocket, JTextArea chatWindow,JTextField userText,ObjectOutputStream output,ObjectInputStream input) {
+	public WorkerRunnable(Socket clientSocket,ServerSocket server, JTextArea chatWindow,ObjectOutputStream output,ObjectInputStream input) {
 		this.clientSocket = clientSocket;
 		this.chatWindow=chatWindow;
-		this.userText=userText;
+		this.server=server;
 		this.output=output;
 		this.input=input;
 	}
 
 	public void run() {
 		try {
-
+			while(true) {
+			waitForConnection();
+			setupStreams();
 			whileChatting();
+			}
 		} catch (IOException e) {
 			//report exception somewhere.
 			e.printStackTrace();
 		}
 		finally {
-			closeConnection();
+			//closeConnection();
 		}
+			
 	}
 	//update chatWindow
 	private void showMessage(final String text){
 		SwingUtilities.invokeLater(
 				new Runnable(){
 					public void run(){
-						chatWindow.append(text);
+						chatWindow.append("\n"+ text);
 					}
 				}
 				);
@@ -55,7 +60,6 @@ public class WorkerRunnable implements Runnable{
 	private void whileChatting() throws IOException{
 		String message = " You are now connected! ";
 		sendMessage(message);
-		ableToType(true);
 		do{
 			try{
 				message = (String) input.readObject();
@@ -65,15 +69,7 @@ public class WorkerRunnable implements Runnable{
 			}
 		}while(!message.equals("CLIENT - END"));
 	}
-	private void ableToType(final boolean tof){
-		SwingUtilities.invokeLater(
-				new Runnable(){
-					public void run(){
-						userText.setEditable(tof);
-					}
-				}
-				);
-	}
+
 	private void sendMessage(String message){
 		try{
 			output.writeObject("SERVER - " + message);
@@ -85,7 +81,6 @@ public class WorkerRunnable implements Runnable{
 	}
 	public void closeConnection(){
 		showMessage("\n Closing Connections... \n");
-		ableToType(false);
 		try{
 			output.close(); //Closes the output path to the client
 			input.close(); //Closes the input path to the server, from the client.
@@ -93,5 +88,18 @@ public class WorkerRunnable implements Runnable{
 		}catch(IOException ioException){
 			ioException.printStackTrace();
 		}
+	}
+	//get stream to send and receive data
+	private void setupStreams() throws IOException{
+		output = new ObjectOutputStream(clientSocket.getOutputStream());
+		output.flush();
+		input = new ObjectInputStream(clientSocket.getInputStream());
+		showMessage("\n Streams are now setup \n");
+	}
+	//waits for someone to connect
+	private void waitForConnection() throws IOException{
+		showMessage(" Waiting for someone to connect... \n");
+		clientSocket = server.accept();
+		showMessage(" Now connected to " + clientSocket.getInetAddress().getHostName());
 	}
 }

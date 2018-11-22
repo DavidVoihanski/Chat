@@ -7,52 +7,30 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class ServerCode extends JFrame {
-	
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
+
+	private static JTextArea chatWindow;
 	private JTextField userText;
-	private JTextArea chatWindow;
 	private ObjectOutputStream output;
 	private ObjectInputStream input;
 	private ServerSocket server;
 	private Socket connection;
-	
+	private server gui;
 	//constructor
-	public ServerCode(JTextArea jTextArea,javax.swing.JLabel jLabel1,javax.swing.JScrollPane jScrollPane1){
-		super("Server");
-		this.jTextArea1=jTextArea;
-		this.jLabel1=jLabel1;
-		this.jScrollPane1=jScrollPane1;
-		userText.setEditable(false);
-		userText.addActionListener(
-			new ActionListener(){
-				public void actionPerformed(ActionEvent event){
-					sendMessage(event.getActionCommand());
-					userText.setText("");
-				}
-			}
-		);
+	public ServerCode(JTextArea j){
+		ServerCode.chatWindow=j;
 	}
-	
+
 	public void startRunning(){
+		
 		try{
+			showMessage("ServerStarting");
 			server = new ServerSocket(6789, 100); //6789 is a dummy port for testing, this can be changed. The 100 is the maximum people waiting to connect.
-			while(true){
-				try{
-					//Trying to connect and have conversation
-					waitForConnection();
-					setupStreams();
-					new Thread(new WorkerRunnable(connection,chatWindow,userText,output,input)
-							).start();
-					
-				}catch(EOFException eofException){
-					showMessage("\n Server ended the connection! ");
-					closeConnection();
-				} 
-			}
+			//while(true){
+				//Trying to connect and have conversation
+   // new Thread(new WaitForConnection(connection,server)).start();
+				//setupStreams();
+				new Thread(new WorkerRunnable(connection,server,chatWindow,output,input)).start(); 
+			//}
 		} catch (IOException ioException){
 			ioException.printStackTrace();
 		}
@@ -63,17 +41,15 @@ public class ServerCode extends JFrame {
 		connection = server.accept();
 		showMessage(" Now connected to " + connection.getInetAddress().getHostName());
 	}
-	
+
 	//get stream to send and receive data
 	private void setupStreams() throws IOException{
 		output = new ObjectOutputStream(connection.getOutputStream());
 		output.flush();
-		
 		input = new ObjectInputStream(connection.getInputStream());
-		
 		showMessage("\n Streams are now setup \n");
 	}
-	
+
 	//during the chat conversation
 	private void whileChatting() throws IOException{
 		String message = " You are now connected! ";
@@ -88,7 +64,7 @@ public class ServerCode extends JFrame {
 			}
 		}while(!message.equals("CLIENT - END"));
 	}
-	
+
 	public void closeConnection(){
 		showMessage("\n Closing Connections... \n");
 		ableToType(false);
@@ -100,7 +76,7 @@ public class ServerCode extends JFrame {
 			ioException.printStackTrace();
 		}
 	}
-	
+
 	//Send a mesage to the client
 	private void sendMessage(String message){
 		try{
@@ -111,25 +87,27 @@ public class ServerCode extends JFrame {
 			chatWindow.append("\n ERROR: CANNOT SEND MESSAGE, PLEASE RETRY");
 		}
 	}
-	
+
 	//update chatWindow
 	private void showMessage(final String text){
-		SwingUtilities.invokeLater(
-			new Runnable(){
-				public void run(){
-					chatWindow.append(text);
-				}
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				chatWindow.append("\n" + text);
 			}
-		);
+		});
+
+
+
 	}
-	
+
 	private void ableToType(final boolean tof){
 		SwingUtilities.invokeLater(
-			new Runnable(){
-				public void run(){
-					userText.setEditable(tof);
+				new Runnable(){
+					public void run(){
+						userText.setEditable(tof);
+					}
 				}
-			}
-		);
+				);
 	}
+
 }

@@ -11,7 +11,7 @@ public class ClientCode extends JFrame{
 	
 	private JTextField userText;
 	private String name;
-	private JTextArea chatWindow;
+	private static JTextArea chatWindow;
 	private ObjectOutputStream output;
 	private ObjectInputStream input;
 	private String message = "";
@@ -19,24 +19,11 @@ public class ClientCode extends JFrame{
 	private Socket connection;
 	
 	//constructor
-	public ClientCode(String host,String name){
-		super("Client");
+	public ClientCode(String host,String name, JTextArea chatWindow){
+		super(name);
+		this.name=name;
+		ClientCode.chatWindow=chatWindow;
 		serverIP = host;
-		userText = new JTextField();
-		userText.setEditable(false);
-		userText.addActionListener(
-				new ActionListener(){
-				public void actionPerformed(ActionEvent event){
-					sendMessage(event.getActionCommand());
-					userText.setText("");
-				}
-			}
-		);
-		add(userText, BorderLayout.NORTH);
-		chatWindow = new JTextArea();
-		add(new JScrollPane(chatWindow));
-		setSize(600, 600); //Sets the window size
-		setVisible(true);
 	}
 	
 	//connect to server
@@ -44,13 +31,11 @@ public class ClientCode extends JFrame{
 		try{
 			connectToServer();
 			setupStreams();
-			whileChatting();
+			new Thread(new ClientListner(input,output,chatWindow,connection)).start();
 		}catch(EOFException eofException){
 			showMessage("\n Client terminated the connection");
 		}catch(IOException ioException){
 			ioException.printStackTrace();
-		}finally{
-			closeConnection();
 		}
 	}
 	

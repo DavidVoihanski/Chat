@@ -268,7 +268,7 @@ public class Client extends javax.swing.JFrame {
 	
 
 	private void Connect(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Connect
-		ClientCode client=new ClientCode(this.ip_ad.getText(),this.my_name.getText());
+		client=new ClientCode(this.ip_ad.getText(),this.my_name.getText(),jTextArea_Main);
 		client.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		client.startRunning();
 
@@ -325,6 +325,7 @@ public class Client extends javax.swing.JFrame {
 	}
 
 	// Variables declaration - do not modify//GEN-BEGIN:variables
+	private static ClientCode client;
 	private javax.swing.JTextField dst;
 	private javax.swing.JTextField ip_ad;
 	private javax.swing.JButton jButton_send;
