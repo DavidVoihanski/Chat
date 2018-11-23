@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -23,32 +24,31 @@ public class WorkerRunnable implements Runnable{
 	private ObjectInputStream input;
 	private JTextArea chatWindow;
 	private ServerSocket server;
-	private ArrayList<Socket>connected;
+	private ArrayList<ObjectOutputStream>outputs;
+	private String name;
 
-	public WorkerRunnable(Socket clientSocket,ServerSocket server, JTextArea chatWindow,ObjectOutputStream output,ObjectInputStream input,ArrayList<Socket> connected) {
+	public WorkerRunnable(String name, JTextArea chatWindow, Socket clientSocket, ObjectInputStream input,ObjectOutputStream output,ArrayList<ObjectOutputStream>outputs) {
 		this.clientSocket = clientSocket;
 		this.chatWindow=chatWindow;
-		this.server=server;
 		this.output=output;
 		this.input=input;
-		this.connected=connected;
+		this.outputs=outputs;
+		this.name=name;
 	}
 
 	public void run() {
 		try {
 			while(true) {
-			waitForConnection();
-			setupStreams();
-			whileChatting();
+				whileChatting();
 			}
 		} catch (IOException e) {
 			//report exception somewhere.
 			e.printStackTrace();
 		}
 		finally {
-			//closeConnection();
+			closeConnection();
 		}
-			
+
 	}
 	//update chatWindow
 	private void showMessage(final String text){
@@ -61,12 +61,13 @@ public class WorkerRunnable implements Runnable{
 				);
 	}
 	private void whileChatting() throws IOException{
-		String message = " You are now connected! ";
-		sendMessage(message);
+		String message = "is now connected! ";
+		sendMessage(name+": "+message);
 		do{
 			try{
 				message = (String) input.readObject();
-				showMessage("\n" + message);
+				//showMessage("\n" + message);
+				sendMessage("\n" + message);
 			}catch(ClassNotFoundException classNotFoundException){
 				showMessage("The user has sent an unknown object!");
 			}
@@ -75,9 +76,13 @@ public class WorkerRunnable implements Runnable{
 
 	private void sendMessage(String message){
 		try{
-			output.writeObject("SERVER - " + message);
-			output.flush();
-			showMessage("\nSERVER -" + message);
+			Iterator<ObjectOutputStream>it=outputs.iterator();
+			while(it.hasNext()) {
+				output=it.next();
+				output.writeObject(message);
+				output.flush();
+				showMessage(message);
+			}
 		}catch(IOException ioException){
 			chatWindow.append("\n ERROR: CANNOT SEND MESSAGE, PLEASE RETRY");
 		}
@@ -104,7 +109,6 @@ public class WorkerRunnable implements Runnable{
 	private void waitForConnection() throws IOException{
 		showMessage(" Waiting for someone to connect... \n");
 		clientSocket = server.accept();
-		connected.add(clientSocket);
 		showMessage(" Now connected to " + clientSocket.getInetAddress().getHostName());
 	}
 }

@@ -31,6 +31,7 @@ public class ClientCode extends JFrame{
 		try{
 			connectToServer();
 			setupStreams();
+			sendNameToServer();
 			new Thread(new ClientListner(input,output,chatWindow,connection)).start();
 		}catch(EOFException eofException){
 			showMessage("\n Client terminated the connection");
@@ -53,7 +54,15 @@ public class ClientCode extends JFrame{
 		input = new ObjectInputStream(connection.getInputStream());
 		showMessage("\n The streams are now set up! \n");
 	}
-	
+	private void sendNameToServer() {
+		try {
+			output.writeObject(name);
+			output.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 //	//while chatting with server
 //	private void whileChatting() throws IOException{
 //		ableToType(true);
@@ -84,7 +93,7 @@ public class ClientCode extends JFrame{
 	public void sendMessage(String message){
 		try{
 			if(message!="") {
-			output.writeObject("CLIENT - " + message);
+			output.writeObject("\n> "+name+": " + message);
 			output.flush();
 			showMessage("\n> "+name+": "+message);
 			}

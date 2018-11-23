@@ -7,6 +7,7 @@ package chat;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.GroupLayout.Alignment;
@@ -269,6 +270,7 @@ public class Client extends javax.swing.JFrame {
 
 	private void Connect(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Connect
 		client=new ClientCode(this.ip_ad.getText(),this.my_name.getText(),jTextArea_Main);
+		connected.add(client);
 		client.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		message_field.setEditable(true);
 		jButton_send.setEnabled(true);
@@ -329,10 +331,12 @@ public class Client extends javax.swing.JFrame {
 				new Client().setVisible(true);
 			}
 		});
+		
 	}
 
 	// Variables declaration - do not modify//GEN-BEGIN:variables
 	private static ClientCode client;
+	private ArrayList<ClientCode>connected=new ArrayList<ClientCode>();
 	private javax.swing.JTextField dst;
 	private javax.swing.JTextField ip_ad;
 	private javax.swing.JButton jButton_send;
