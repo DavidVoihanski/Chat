@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -22,13 +23,15 @@ public class WorkerRunnable implements Runnable{
 	private ObjectInputStream input;
 	private JTextArea chatWindow;
 	private ServerSocket server;
+	private ArrayList<Socket>connected;
 
-	public WorkerRunnable(Socket clientSocket,ServerSocket server, JTextArea chatWindow,ObjectOutputStream output,ObjectInputStream input) {
+	public WorkerRunnable(Socket clientSocket,ServerSocket server, JTextArea chatWindow,ObjectOutputStream output,ObjectInputStream input,ArrayList<Socket> connected) {
 		this.clientSocket = clientSocket;
 		this.chatWindow=chatWindow;
 		this.server=server;
 		this.output=output;
 		this.input=input;
+		this.connected=connected;
 	}
 
 	public void run() {
@@ -85,6 +88,7 @@ public class WorkerRunnable implements Runnable{
 			output.close(); //Closes the output path to the client
 			input.close(); //Closes the input path to the server, from the client.
 			clientSocket.close(); //Closes the connection between you can the client
+			server.close();
 		}catch(IOException ioException){
 			ioException.printStackTrace();
 		}
@@ -100,6 +104,7 @@ public class WorkerRunnable implements Runnable{
 	private void waitForConnection() throws IOException{
 		showMessage(" Waiting for someone to connect... \n");
 		clientSocket = server.accept();
+		connected.add(clientSocket);
 		showMessage(" Now connected to " + clientSocket.getInetAddress().getHostName());
 	}
 }

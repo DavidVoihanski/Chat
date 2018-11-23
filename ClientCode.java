@@ -54,38 +54,40 @@ public class ClientCode extends JFrame{
 		showMessage("\n The streams are now set up! \n");
 	}
 	
-	//while chatting with server
-	private void whileChatting() throws IOException{
-		ableToType(true);
-		do{
-			try{
-				message = (String) input.readObject();
-				showMessage("\n" + message);
-			}catch(ClassNotFoundException classNotFoundException){
-				showMessage("Unknown data received!");
-			}
-		}while(!message.equals("SERVER - END"));	
-	}
-	
-	//Close connection
-	private void closeConnection(){
-		showMessage("\n Closing the connection!");
-		ableToType(false);
-		try{
-			output.close();
-			input.close();
-			connection.close();
-		}catch(IOException ioException){
-			ioException.printStackTrace();
-		}
-	}
+//	//while chatting with server
+//	private void whileChatting() throws IOException{
+//		ableToType(true);
+//		do{
+//			try{
+//				message = (String) input.readObject();
+//				showMessage("\n" + message);
+//			}catch(ClassNotFoundException classNotFoundException){
+//				showMessage("Unknown data received!");
+//			}
+//		}while(!message.equals("SERVER - END"));	
+//	}
+//	
+//	//Close connection
+//	private void closeConnection(){
+//		showMessage("\n Closing the connection!");
+//		ableToType(false);
+//		try{
+//			output.close();
+//			input.close();
+//			connection.close();
+//		}catch(IOException ioException){
+//			ioException.printStackTrace();
+//		}
+//	}
 	
 	//send message to server
-	private void sendMessage(String message){
+	public void sendMessage(String message){
 		try{
+			if(message!="") {
 			output.writeObject("CLIENT - " + message);
 			output.flush();
-			showMessage("\nCLIENT - " + message);
+			showMessage("\n> "+name+": "+message);
+			}
 		}catch(IOException ioException){
 			chatWindow.append("\n Oops! Something went wrong!");
 		}
@@ -102,14 +104,17 @@ public class ClientCode extends JFrame{
 		);
 	}
 	
-	//allows user to type
-	private void ableToType(final boolean tof){
-		SwingUtilities.invokeLater(
-			new Runnable(){
-				public void run(){
-					userText.setEditable(tof);
-				}
-			}
-		);
+//	//allows user to type
+//	private void ableToType(final boolean tof){
+//		SwingUtilities.invokeLater(
+//			new Runnable(){
+//				public void run(){
+//					userText.setEditable(tof);
+//				}
+//			}
+//		);
+//	}
+	public Socket getConnection() {
+		return this.connection;
 	}
 }

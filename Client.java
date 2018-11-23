@@ -270,17 +270,24 @@ public class Client extends javax.swing.JFrame {
 	private void Connect(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Connect
 		client=new ClientCode(this.ip_ad.getText(),this.my_name.getText(),jTextArea_Main);
 		client.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		message_field.setEditable(true);
+		jButton_send.setEnabled(true);
+		jToggleButton_connect.setEnabled(false);
 		client.startRunning();
 
 	}//GEN-LAST:event_Connect
 
 	private void Send(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Send
 		System.out.println("send botten clicked");
+		if(client.getConnection()!=null) {
+			client.sendMessage(message_field.getText());
+		}
 
 	}//GEN-LAST:event_Send
 
 	private void Disconnect(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Disconnect
 		System.out.println("Disconnect botten clicked");
+		
 
 
 	}//GEN-LAST:event_Disconnect
