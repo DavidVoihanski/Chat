@@ -16,7 +16,6 @@ public class ClientListner implements Runnable {
 	private ObjectOutputStream output;
 	private Socket clientSocket;
 	private String name;          //holds the name of this client
-	//private JTextField dst;
 
 	public ClientListner(String name,JTextField dst, ObjectInputStream input,ObjectOutputStream output,JTextArea chatWindow,Socket clientSocket) {
 		this.input=input;
@@ -24,7 +23,6 @@ public class ClientListner implements Runnable {
 		this.clientSocket=clientSocket;
 		this.chatWindow=chatWindow;
 		this.name=name;
-		//this.dst=dst;
 
 	}
 

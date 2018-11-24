@@ -78,7 +78,7 @@ public class ClientCode extends JFrame{
 	}
 	
 	//update chat window
-	private void showMessage(final String message){
+	public void showMessage(final String message){
 		SwingUtilities.invokeLater(
 			new Runnable(){
 				public void run(){
@@ -91,4 +91,28 @@ public class ClientCode extends JFrame{
 	public Socket getConnection() {
 		return this.connection;
 	}
+	public void closeConnection(){
+		showMessage("\n Closing Connections... \n");
+		try{
+			output.close(); //Closes the output path to the client
+			input.close(); //Closes the input path to the server, from the client.
+			connection.close(); //Closes the connection between you can the client
+		}catch(IOException ioException){
+			ioException.printStackTrace();
+		}
+	}
+	/**
+	 * sends a command to the server
+	 * not meant to be sent to other clients!
+	 */
+	public void sendCommand(String command) {
+		try {
+			output.writeObject(command);
+			output.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 }

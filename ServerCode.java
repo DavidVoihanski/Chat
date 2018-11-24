@@ -3,6 +3,8 @@ package chat;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Iterator;
+
 import javax.swing.*;
 
 @SuppressWarnings("serial")
@@ -57,5 +59,4 @@ public class ServerCode extends JFrame {
 	public ServerSocket getServerSocket() {
 		return this.server;
 	}
-
 }

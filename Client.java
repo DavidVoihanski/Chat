@@ -22,7 +22,7 @@ public class Client extends javax.swing.JFrame {
 	 */
 	private static final long serialVersionUID = 3970976847258960979L;
 
-	
+
 	/**
 	 * Creates new form Client
 	 */
@@ -249,7 +249,7 @@ public class Client extends javax.swing.JFrame {
 
 
 	private void Reset(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Clear
-
+		client.sendCommand("disconnect");
 		dispose();
 		Client game = new Client();
 		game.setVisible(true);
@@ -258,25 +258,33 @@ public class Client extends javax.swing.JFrame {
 
 	private void showonline(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SHOWONLINE
 		System.out.println("showonline botten clicked");
-
+		if(jToggleButton_showOnline.isEnabled()) {
+			client.showMessage("\n*****ONLINE USERS*****");
+			client.sendCommand("showconnected");
+		}
 	}//GEN-LAST:event_SHOWONLINE
-	
+
 
 	private void Connect(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Connect
-		client=new ClientCode(this.ip_ad.getText(),this.my_name.getText(),dst,jTextArea_Main);
-		connected.add(client);
-		client.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		message_field.setEditable(true);
-		jButton_send.setEnabled(true);
-		jToggleButton_connect.setEnabled(false);
-		dst.setEditable(true);
-		client.startRunning();
+		if(jToggleButton_connect.isEnabled()) {
+			client=new ClientCode(this.ip_ad.getText(),this.my_name.getText(),dst,jTextArea_Main);//creates a new client
+			client.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			message_field.setEditable(true);
+			jButton_send.setEnabled(true);
+			jToggleButton_connect.setEnabled(false);
+			jToggleButton_showOnline.setEnabled(true);
+			jButton_disconnect.setEnabled(true);
+			dst.setEditable(true);
+			my_name.setEditable(false);; //can't change name when connected!
+			ip_ad.setEditable(false);; //can't change address when connected!
+			client.startRunning();
+		}
 
 	}//GEN-LAST:event_Connect
 
 	private void Send(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Send
 		System.out.println("send botten clicked");
-		if(client.getConnection()!=null) {
+		if(client.getConnection()!=null&&jButton_send.isEnabled()) {
 			//client.send(dst.getText());          //first send the dst
 			client.sendMessage(message_field.getText());//then the message
 		}
@@ -285,7 +293,17 @@ public class Client extends javax.swing.JFrame {
 
 	private void Disconnect(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Disconnect
 		System.out.println("Disconnect botten clicked");
-		
+		if(jButton_disconnect.isEnabled()) {
+			message_field.setEditable(false);
+			jButton_send.setEnabled(false);
+			jToggleButton_connect.setEnabled(true);
+			jToggleButton_showOnline.setEnabled(false);
+			jButton_disconnect.setEnabled(false);
+			dst.setEditable(false);
+			my_name.setEditable(true);; //can't change name when connected!
+			ip_ad.setEditable(true);; //can't change address when connected!
+			client.sendCommand("disconnect");
+		}
 
 
 	}//GEN-LAST:event_Disconnect
@@ -327,12 +345,11 @@ public class Client extends javax.swing.JFrame {
 				new Client().setVisible(true);
 			}
 		});
-		
+
 	}
 
 	// Variables declaration - do not modify//GEN-BEGIN:variables
 	private static ClientCode client;
-	private ArrayList<ClientCode>connected=new ArrayList<ClientCode>();
 	private javax.swing.JTextField dst;
 	private javax.swing.JTextField ip_ad;
 	private javax.swing.JButton jButton_send;
