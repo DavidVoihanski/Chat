@@ -39,11 +39,10 @@ public class WorkerRunnable implements Runnable{
 				whileChatting();
 			}
 		} catch (IOException e) {
-			//report exception somewhere.
 			e.printStackTrace();
 		}
 		finally {
-			closeConnection();
+				disconnect();
 		}
 
 	}
@@ -60,26 +59,12 @@ public class WorkerRunnable implements Runnable{
 	private void whileChatting() throws IOException{
 
 		String message = " is now connected! ";
-		sendMessage(name + message,"All");
+		sendMessage(name + message,"All");  //notifies everyone this client connected
 		do{
 			try{
 				message = (String) input.readObject();
-				if(message.compareTo("showconnected")==0) {	//if "show online users" has been clicked
-					showOnline();							//prints all online users 
-					
-				}
-				else if(message.compareTo("disconnect")==0) {	//if disconnect has been clicked
-					sendMessage(name+" left!","All");
-					Iterator<ClientHolder>it2=clients.iterator();
-					ClientHolder find;
-					String _name;
-					while(it2.hasNext()) {				//finds this client in our list and removes it
-						find=it2.next();
-						_name=find.getName();
-						if(_name==name)it2.remove(); 
-					}
-					closeConnection();				//closes the sockets and streams
-				}
+				if(message.compareTo("showconnected")==0) showOnline(); 	//if "show online users" has been clicked prints all online users 
+				else if(message.compareTo("disconnect")==0) disconnect();	//if disconnect has been clicked
 				else {
 					int endOfDest=message.indexOf('&');         //message is always sent with the dest at the start seperated by '&'
 					String dest=message.substring(0, endOfDest);	//takes the dest section
@@ -147,7 +132,8 @@ public class WorkerRunnable implements Runnable{
 			}
 		}
 	}
-	public void closeConnection(){
+	//closes the sockets and streams
+	private void closeConnection(){
 		showMessage("\n Closing Connections... \n");
 		try{
 			thisOutput.close(); //Closes the output path to the client
@@ -157,10 +143,9 @@ public class WorkerRunnable implements Runnable{
 			ioException.printStackTrace();
 		}
 	}
-	/**
-	 * prints all the online clients to the requesting client
-	 */
-	public void showOnline() {
+	
+	// prints all the online clients to this client
+	private void showOnline() {
 		Iterator<ClientHolder>it=clients.iterator();
 		ClientHolder show;
 		if(clients.size()>1) {							//if anyone else is connected
@@ -185,5 +170,18 @@ public class WorkerRunnable implements Runnable{
 				e.printStackTrace();
 			}
 		}
+	}
+	//closes the connection and notifies everyone this client left
+	private void disconnect() {
+		sendMessage(name+" left!","All");
+		Iterator<ClientHolder>it2=clients.iterator();
+		ClientHolder find;
+		String _name;
+		while(it2.hasNext()) {				//finds this client in our list and removes it
+			find=it2.next();
+			_name=find.getName();
+			if(_name==name)it2.remove(); 
+		}
+		closeConnection();				//closes the sockets and streams
 	}
 }
