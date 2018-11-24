@@ -17,11 +17,13 @@ public class ClientCode extends JFrame{
 	private String message = "";
 	private String serverIP;
 	private Socket connection;
+	private JTextField dst;
 	
 	//constructor
-	public ClientCode(String host,String name, JTextArea chatWindow){
+	public ClientCode(String host,String name,JTextField dst ,JTextArea chatWindow){
 		super(name);
 		this.name=name;
+		this.dst=dst;
 		ClientCode.chatWindow=chatWindow;
 		serverIP = host;
 	}
@@ -32,7 +34,7 @@ public class ClientCode extends JFrame{
 			connectToServer();
 			setupStreams();
 			sendNameToServer();
-			new Thread(new ClientListner(input,output,chatWindow,connection)).start();
+			new Thread(new ClientListner(name,dst,input,output,chatWindow,connection)).start();
 		}catch(EOFException eofException){
 			showMessage("\n Client terminated the connection");
 		}catch(IOException ioException){
@@ -63,39 +65,14 @@ public class ClientCode extends JFrame{
 			e.printStackTrace();
 		}
 	}
-//	//while chatting with server
-//	private void whileChatting() throws IOException{
-//		ableToType(true);
-//		do{
-//			try{
-//				message = (String) input.readObject();
-//				showMessage("\n" + message);
-//			}catch(ClassNotFoundException classNotFoundException){
-//				showMessage("Unknown data received!");
-//			}
-//		}while(!message.equals("SERVER - END"));	
-//	}
-//	
-//	//Close connection
-//	private void closeConnection(){
-//		showMessage("\n Closing the connection!");
-//		ableToType(false);
-//		try{
-//			output.close();
-//			input.close();
-//			connection.close();
-//		}catch(IOException ioException){
-//			ioException.printStackTrace();
-//		}
-//	}
 	
-	//send message to server
 	public void sendMessage(String message){
+		String dest=dst.getText();
 		try{
-			if(message!="") {
-			output.writeObject("\n> "+name+": " + message);
+			if(message.length()>0) {
+			output.writeObject(dest+"&"+"\n> "+name+": " + message);
 			output.flush();
-			showMessage("\n> "+name+": "+message);
+			if(dest!=name)showMessage("\n> "+name+": "+message);  //to avoid double messaging
 			}
 		}catch(IOException ioException){
 			chatWindow.append("\n Oops! Something went wrong!");
@@ -113,16 +90,6 @@ public class ClientCode extends JFrame{
 		);
 	}
 	
-//	//allows user to type
-//	private void ableToType(final boolean tof){
-//		SwingUtilities.invokeLater(
-//			new Runnable(){
-//				public void run(){
-//					userText.setEditable(tof);
-//				}
-//			}
-//		);
-//	}
 	public Socket getConnection() {
 		return this.connection;
 	}

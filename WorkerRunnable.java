@@ -20,19 +20,22 @@ import javax.swing.SwingUtilities;
 public class WorkerRunnable implements Runnable{
 
 	protected Socket clientSocket = null;
-	private ObjectOutputStream output;
+	private ObjectOutputStream output;				//can change to send to different clients
+	private final ObjectOutputStream thisOutput;	//remembers this connectetion's output
 	private ObjectInputStream input;
 	private JTextArea chatWindow;
 	private ServerSocket server;
-	private ArrayList<ObjectOutputStream>outputs;
+	private ArrayList<ClientHolder>clients;
 	private String name;
+	private String dst;
 
-	public WorkerRunnable(String name, JTextArea chatWindow, Socket clientSocket, ObjectInputStream input,ObjectOutputStream output,ArrayList<ObjectOutputStream>outputs) {
+	public WorkerRunnable(String name, JTextArea chatWindow, Socket clientSocket, ObjectInputStream input,ObjectOutputStream output,ArrayList<ClientHolder>clients) {
 		this.clientSocket = clientSocket;
 		this.chatWindow=chatWindow;
+		this.thisOutput=output;
 		this.output=output;
 		this.input=input;
-		this.outputs=outputs;
+		this.clients=clients;
 		this.name=name;
 	}
 
@@ -61,30 +64,64 @@ public class WorkerRunnable implements Runnable{
 				);
 	}
 	private void whileChatting() throws IOException{
-		String message = "is now connected! ";
-		sendMessage(name+": "+message);
+
+		String message = " is now connected! ";
+		sendMessage(message,"All");
 		do{
 			try{
 				message = (String) input.readObject();
-				//showMessage("\n" + message);
-				sendMessage("\n" + message);
+				int endOfDest=message.indexOf('&');         //message is always sent with the dest at the start seperated by '&'
+				String dest=message.substring(0, endOfDest);	//takes the dest section
+				message=message.substring(endOfDest+1);			//sends the rest of the message
+				sendMessage(message,dest);
 			}catch(ClassNotFoundException classNotFoundException){
 				showMessage("The user has sent an unknown object!");
 			}
 		}while(!message.equals("CLIENT - END"));
 	}
 
-	private void sendMessage(String message){
-		try{
-			Iterator<ObjectOutputStream>it=outputs.iterator();
-			while(it.hasNext()) {
-				output=it.next();
-				output.writeObject(message);
-				output.flush();
-				showMessage(message);
-			}
-		}catch(IOException ioException){
-			chatWindow.append("\n ERROR: CANNOT SEND MESSAGE, PLEASE RETRY");
+	private void sendMessage(String message,String dest){
+
+		Iterator<ClientHolder>it=clients.iterator();
+		boolean wasSent=false;   //if the message was successfully sent
+		boolean selfMessage=false;	//if tried to message itself
+		while(it.hasNext()) {                    //checks all connected users
+			ClientHolder currClient=it.next();
+			String clientName=currClient.getName();
+			if(dest.compareTo(clientName)==0||dest.compareTo("All")==0)
+				if(clientName!=name)
+					try{
+						wasSent=true;
+						output=currClient.getOutput();   //takes the output stream from the current client
+						output.writeObject(message);     
+						output.flush();
+						showMessage(message);
+					}catch(IOException ioException){				//if the connection was already closed 
+						chatWindow.append("\n The connection to "+name+" was already closed");
+						it.remove();								//Clients already left
+					}
+				else if(dest.compareTo("All")!=0){
+					message="Can't message yourself!";
+					selfMessage=true;
+					try {
+						thisOutput.writeObject(message);   
+						thisOutput.flush();
+						showMessage(message);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}     
+					showMessage(message);
+				}
+		}
+		if(!wasSent&&!selfMessage) {
+			try {
+				thisOutput.writeObject("FAILED: "+dest+" is not connected!");
+				thisOutput.flush();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}   
 		}
 	}
 	public void closeConnection(){
@@ -111,4 +148,13 @@ public class WorkerRunnable implements Runnable{
 		clientSocket = server.accept();
 		showMessage(" Now connected to " + clientSocket.getInetAddress().getHostName());
 	}
+	//	private boolean isConnected(){
+	//		Iterator<ClientHolder>check=clients.iterator();
+	//		ClientHolder checked;
+	//		while(check.hasNext()) {
+	//			checked=check.next();
+	//			
+	//		}
+	//	}
+
 }

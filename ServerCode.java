@@ -15,20 +15,20 @@ public class ServerCode extends JFrame {
 	private ObjectInputStream input;
 	private ServerSocket server;
 	private Socket connection;
-	private ArrayList<ObjectOutputStream>outputs;
+	private ArrayList<ClientHolder>clients;
 
 	//constructor
 	public ServerCode(JTextArea j){
 		ServerCode.chatWindow=j;
-        outputs=new ArrayList<ObjectOutputStream>();
+        clients=new ArrayList<ClientHolder>();
 	}
 
 	public void startRunning(){
 
 		try{
-			showMessage("ServerStarting");
+			showMessage("Servers starting!");
 			server = new ServerSocket(6789, 100); //6789 is a dummy port for testing, this can be changed. The 100 is the maximum people waiting to connect.
-			new Thread(new SetConnection(chatWindow,connection,server,output,input,outputs)).start();
+			new Thread(new SetConnection(chatWindow,connection,server,output,input,clients)).start();
 		//	new Thread(new WorkerRunnable(connection,server,chatWindow,output,input,connected)).start(); 
 		} catch (IOException ioException){
 			ioException.printStackTrace();
@@ -52,7 +52,6 @@ public class ServerCode extends JFrame {
 
 	public void closeConnection(){
 		showMessage("\n Closing Connections... \n");
-		ableToType(false);
 		try{
 			if(input!=null) output.close(); //Closes the output path to the client
 			if(output!=null) input.close(); //Closes the input path to the server, from the client.
