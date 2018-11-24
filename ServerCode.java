@@ -3,14 +3,12 @@ package chat;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 
+@SuppressWarnings("serial")
 public class ServerCode extends JFrame {
 
 	private static JTextArea chatWindow;
-	private JTextField userText;
 	private ObjectOutputStream output;
 	private ObjectInputStream input;
 	private ServerSocket server;
@@ -29,25 +27,9 @@ public class ServerCode extends JFrame {
 			showMessage("Servers starting!");
 			server = new ServerSocket(6789, 100); //6789 is a dummy port for testing, this can be changed. The 100 is the maximum people waiting to connect.
 			new Thread(new SetConnection(chatWindow,connection,server,output,input,clients)).start();
-		//	new Thread(new WorkerRunnable(connection,server,chatWindow,output,input,connected)).start(); 
 		} catch (IOException ioException){
 			ioException.printStackTrace();
 		}
-	}
-
-	//during the chat conversation
-	private void whileChatting() throws IOException{
-		String message = " You are now connected! ";
-		sendMessage(message);
-		ableToType(true);
-		do{
-			try{
-				message = (String) input.readObject();
-				showMessage("\n" + message);
-			}catch(ClassNotFoundException classNotFoundException){
-				showMessage("The user has sent an unknown object!");
-			}
-		}while(!message.equals("CLIENT - END"));
 	}
 
 	public void closeConnection(){
@@ -63,17 +45,6 @@ public class ServerCode extends JFrame {
 		}
 	}
 
-	//Send a mesage to the client
-	private void sendMessage(String message){
-		try{
-			output.writeObject("SERVER - " + message);
-			output.flush();
-			showMessage("\nSERVER -" + message);
-		}catch(IOException ioException){
-			chatWindow.append("\n ERROR: CANNOT SEND MESSAGE, PLEASE RETRY");
-		}
-	}
-
 	//update chatWindow
 	private void showMessage(final String text){
 		SwingUtilities.invokeLater(new Runnable() {
@@ -81,20 +52,8 @@ public class ServerCode extends JFrame {
 				chatWindow.append("\n" + text);
 			}
 		});
-
-
-
 	}
 
-	private void ableToType(final boolean tof){
-		SwingUtilities.invokeLater(
-				new Runnable(){
-					public void run(){
-						userText.setEditable(tof);
-					}
-				}
-				);
-	}
 	public ServerSocket getServerSocket() {
 		return this.server;
 	}
