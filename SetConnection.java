@@ -6,9 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 public class SetConnection implements Runnable{
@@ -65,15 +63,7 @@ public class SetConnection implements Runnable{
 		input = new ObjectInputStream(clientSocket.getInputStream());
 		showMessage("\n Streams are now setup \n");
 	}
-	private void sendMessage(String message){
-		try{
-			output.writeObject(message);
-			output.flush();
-			//showMessage("\nSERVER -" + message);
-		}catch(IOException ioException){
-			chatWindow.append("\n ERROR: CANNOT SEND MESSAGE, PLEASE RETRY");
-		}
-	}
+	
 	private void showMessage(final String text){
 		SwingUtilities.invokeLater(
 				new Runnable(){

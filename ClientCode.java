@@ -2,19 +2,17 @@ package chat;
 
 import java.io.*;
 import java.net.*;
-import java.awt.*;
-import java.awt.event.*;
 
 import javax.swing.*;
 
+
+@SuppressWarnings("serial")
 public class ClientCode extends JFrame{
 	
-	private JTextField userText;
 	private String name;
 	private static JTextArea chatWindow;
 	private ObjectOutputStream output;
 	private ObjectInputStream input;
-	private String message = "";
 	private String serverIP;
 	private Socket connection;
 	private JTextField dst;

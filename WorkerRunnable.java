@@ -1,17 +1,13 @@
 package chat;
 
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Iterator;
-
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 /**
@@ -27,7 +23,6 @@ public class WorkerRunnable implements Runnable{
 	private ServerSocket server;
 	private ArrayList<ClientHolder>clients;
 	private String name;
-	private String dst;
 
 	public WorkerRunnable(String name, JTextArea chatWindow, Socket clientSocket, ObjectInputStream input,ObjectOutputStream output,ArrayList<ClientHolder>clients) {
 		this.clientSocket = clientSocket;
@@ -135,26 +130,4 @@ public class WorkerRunnable implements Runnable{
 			ioException.printStackTrace();
 		}
 	}
-	//get stream to send and receive data
-	private void setupStreams() throws IOException{
-		output = new ObjectOutputStream(clientSocket.getOutputStream());
-		output.flush();
-		input = new ObjectInputStream(clientSocket.getInputStream());
-		showMessage("\n Streams are now setup \n");
-	}
-	//waits for someone to connect
-	private void waitForConnection() throws IOException{
-		showMessage(" Waiting for someone to connect... \n");
-		clientSocket = server.accept();
-		showMessage(" Now connected to " + clientSocket.getInetAddress().getHostName());
-	}
-	//	private boolean isConnected(){
-	//		Iterator<ClientHolder>check=clients.iterator();
-	//		ClientHolder checked;
-	//		while(check.hasNext()) {
-	//			checked=check.next();
-	//			
-	//		}
-	//	}
-
 }

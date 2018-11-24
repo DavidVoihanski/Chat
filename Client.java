@@ -5,18 +5,12 @@
  */
 package chat;
 
-import java.io.*;
-import java.net.*;
 import java.util.ArrayList;
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
-
 import javax.swing.GroupLayout;
 import javax.swing.JFrame;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+
 
 /**
  * @author erlichsefi
