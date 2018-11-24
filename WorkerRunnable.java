@@ -69,6 +69,7 @@ public class WorkerRunnable implements Runnable{
 					
 				}
 				else if(message.compareTo("disconnect")==0) {	//if disconnect has been clicked
+					sendMessage(name+" left!","All");
 					Iterator<ClientHolder>it2=clients.iterator();
 					ClientHolder find;
 					String _name;

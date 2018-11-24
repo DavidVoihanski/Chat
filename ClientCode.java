@@ -27,17 +27,11 @@ public class ClientCode extends JFrame{
 	}
 	
 	//connect to server
-	public void startRunning(){
-		try{
+	public void startRunning()throws Exception{
 			connectToServer();
 			setupStreams();
 			sendNameToServer();
 			new Thread(new ClientListner(name,dst,input,output,chatWindow,connection)).start();
-		}catch(EOFException eofException){
-			showMessage("\n Client terminated the connection");
-		}catch(IOException ioException){
-			ioException.printStackTrace();
-		}
 	}
 	
 	//connect to server
