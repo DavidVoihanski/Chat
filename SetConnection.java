@@ -44,7 +44,7 @@ public class SetConnection implements Runnable{
 				ClientHolder currClient=new ClientHolder(name,output); //stores this client
 				clients.add(currClient);
 				showMessage(name+" is now connected!");
-				new Thread(new WorkerRunnable(name,chatWindow,clientSocket,input,output,clients)).start();
+				new Thread(new ConnectionListner(name,chatWindow,clientSocket,input,output,clients)).start();
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

@@ -1,19 +1,16 @@
 package chat;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
-/**
-
- */
-public class WorkerRunnable implements Runnable{
-
+public class ConnectionListner implements Runnable {
 	protected Socket clientSocket = null;
 	private ObjectOutputStream output;				//can change to send to different clients
 	private final ObjectOutputStream thisOutput;	//remembers this connectetion's output
@@ -22,7 +19,7 @@ public class WorkerRunnable implements Runnable{
 	private ArrayList<ClientHolder>clients;
 	private String name;
 
-	public WorkerRunnable(String name, JTextArea chatWindow, Socket clientSocket, ObjectInputStream input,ObjectOutputStream output,ArrayList<ClientHolder>clients) {
+	public ConnectionListner(String name, JTextArea chatWindow, Socket clientSocket, ObjectInputStream input,ObjectOutputStream output,ArrayList<ClientHolder>clients) {
 		this.clientSocket = clientSocket;
 		this.chatWindow=chatWindow;
 		this.thisOutput=output;
@@ -41,9 +38,8 @@ public class WorkerRunnable implements Runnable{
 			e.printStackTrace();
 		}
 		finally {
-				disconnect();
+			disconnect();
 		}
-
 	}
 	//update chatWindow
 	private void showMessage(final String text){
@@ -63,7 +59,7 @@ public class WorkerRunnable implements Runnable{
 			try{
 				message = (String) input.readObject();
 				if(message.compareTo("showconnected")==0) showOnline(); 	//if "show online users" has been clicked prints all online users 
-				else if(message.compareTo("disconnect")==0) disconnect();	//if disconnect has been clicked
+				else if(message.compareTo("disconnect")==0) throw new IOException("Client closed the connection");	//if disconnect has been clicked
 				else {
 					int endOfDest=message.indexOf('&');         //message is always sent with the dest at the start seperated by '&'
 					String dest=message.substring(0, endOfDest);	//takes the dest section
@@ -90,9 +86,8 @@ public class WorkerRunnable implements Runnable{
 						try{             
 							wasSent=true;
 							output=currClient.getOutput();   //takes the output stream from the current client
-							output.writeObject(message);     
+							output.writeObject(message);     //sends it
 							output.flush();
-							//showMessage(message);			//sends the message to the client and shows the message 
 						}catch(IOException ioException){				//if the connection was already closed 
 							chatWindow.append("\n The connection to "+name+" was already closed");
 							it.remove();								//Clients already left
@@ -103,12 +98,10 @@ public class WorkerRunnable implements Runnable{
 						try {
 							thisOutput.writeObject(message);   
 							thisOutput.flush();
-							//showMessage(message);
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}     
-						//showMessage(message);
 					}
 			}
 			if(!wasSent&&!selfMessage) {
@@ -133,7 +126,7 @@ public class WorkerRunnable implements Runnable{
 	}
 	//closes the sockets and streams
 	private void closeConnection(){
-		showMessage("\n Closing Connections... \n");
+		showMessage(name+ " left!");
 		try{
 			thisOutput.close(); //Closes the output path to the client
 			input.close(); //Closes the input path to the server, from the client.
