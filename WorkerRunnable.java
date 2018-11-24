@@ -3,7 +3,6 @@ package chat;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -93,7 +92,7 @@ public class WorkerRunnable implements Runnable{
 							output=currClient.getOutput();   //takes the output stream from the current client
 							output.writeObject(message);     
 							output.flush();
-							showMessage(message);			//sends the message to the client and shows the message 
+							//showMessage(message);			//sends the message to the client and shows the message 
 						}catch(IOException ioException){				//if the connection was already closed 
 							chatWindow.append("\n The connection to "+name+" was already closed");
 							it.remove();								//Clients already left
@@ -104,12 +103,12 @@ public class WorkerRunnable implements Runnable{
 						try {
 							thisOutput.writeObject(message);   
 							thisOutput.flush();
-							showMessage(message);
+							//showMessage(message);
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}     
-						showMessage(message);
+						//showMessage(message);
 					}
 			}
 			if(!wasSent&&!selfMessage) {

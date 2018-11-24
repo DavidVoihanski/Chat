@@ -51,7 +51,7 @@ public class ServerCode extends JFrame {
 	private void showMessage(final String text){
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				chatWindow.append("\n" + text);
+				chatWindow.append(text);
 			}
 		});
 	}

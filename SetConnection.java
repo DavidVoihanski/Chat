@@ -43,6 +43,7 @@ public class SetConnection implements Runnable{
 				}
 				ClientHolder currClient=new ClientHolder(name,output); //stores this client
 				clients.add(currClient);
+				showMessage(name+" is now connected!");
 				new Thread(new WorkerRunnable(name,chatWindow,clientSocket,input,output,clients)).start();
 			}
 		} catch (IOException e) {
@@ -52,10 +53,8 @@ public class SetConnection implements Runnable{
 
 	}
 	private void waitForConnection() throws IOException{
-		showMessage(" Waiting for someone to connect... \n");
 		clientSocket = server.accept();
-		//connected.add(clientSocket);
-		showMessage(" Now connected to " + clientSocket.getInetAddress().getHostName());
+		showMessage(" \nNow connected to " + clientSocket.getInetAddress().getHostName());
 	}
 	private void setupStreams() throws IOException{
 		output = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -68,7 +67,7 @@ public class SetConnection implements Runnable{
 		SwingUtilities.invokeLater(
 				new Runnable(){
 					public void run(){
-						chatWindow.append("\n"+ text);
+						chatWindow.append(text);
 					}
 				}
 				);
