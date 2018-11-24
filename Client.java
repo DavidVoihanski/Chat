@@ -265,6 +265,10 @@ public class Client extends javax.swing.JFrame {
 	private void Connect(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Connect
 		if(jToggleButton_connect.isEnabled()) {
 			client=new ClientCode(this.ip_ad.getText(),this.my_name.getText(),dst,jTextArea_Main);//creates a new client
+			if(this.my_name.getText().contains("&")) {        //makes sure the name does't contain '&' because it's part of my server-client protocol
+				client.showMessage("\nName can't contain '&'!");
+				return;
+			}
 			client.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			message_field.setEditable(true);
 			jButton_send.setEnabled(true);

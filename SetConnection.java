@@ -6,6 +6,8 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Iterator;
+
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
@@ -41,6 +43,9 @@ public class SetConnection implements Runnable{
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
 				}
+				while(exists(name)) {	//while the name already exists, adds '*' to it
+					name=name+"*";
+				}
 				ClientHolder currClient=new ClientHolder(name,output); //stores this client
 				clients.add(currClient);
 				showMessage(name+" is now connected!");
@@ -71,5 +76,15 @@ public class SetConnection implements Runnable{
 					}
 				}
 				);
+	}
+	//checks if this name already exists
+	private boolean exists(String name) {
+		Iterator<ClientHolder>it3=clients.iterator();
+		ClientHolder _currClient;
+		while(it3.hasNext()) {
+			_currClient=it3.next();
+			if(_currClient.getName().compareTo(name)==0)return true; //if found equal name
+		}
+		return false;  //if not found
 	}
 }
