@@ -70,7 +70,7 @@ public class ClientCode extends JFrame{
 		String dest=dst.getText();
 		try{
 			if(message.length()>0) {
-			output.writeObject(dest+"&"+"\n> "+name+": " + message);
+			output.writeObject(dest+"&"+name+": " + message);
 			output.flush();
 			if(dest!=name)showMessage("\n> "+name+": "+message);  //to avoid double messaging
 			}
