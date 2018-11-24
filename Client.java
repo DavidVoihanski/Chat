@@ -12,7 +12,10 @@ import javax.swing.JFrame;
 
 
 /**
- * @author erlichsefi
+ * This class holds the gui for the Client and listens to commands from it and sends them to to ClientCode
+ * Once connect is pressed, new ClientCode object is created
+ * @author David
+ *
  */
 public class Client extends javax.swing.JFrame {
 
