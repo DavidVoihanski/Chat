@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"chat","l":"Client"},{"p":"chat","l":"ClientCode"},{"p":"chat","l":"ClientHolder"},{"p":"chat","l":"ClientListner"},{"p":"chat","l":"ConnectionListner"},{"p":"chat","l":"server"},{"p":"chat","l":"ServerCode"},{"p":"chat","l":"SetConnection"}]
