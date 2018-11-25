@@ -4,7 +4,12 @@ import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 import javax.swing.*;
-
+/**
+ * The class which holds all of the relevant variables and objects to the server
+ * Opens a server socket and start a Thread using SetConnection class to listen to client trying to connect
+ * @author David
+ *
+ */
 @SuppressWarnings("serial")
 public class ServerCode extends JFrame {
 
@@ -15,12 +20,19 @@ public class ServerCode extends JFrame {
 	private Socket connection;
 	private ArrayList<ClientHolder>clients;
 
-	//constructor
+	/**
+	 * constructor
+	 * @param j The text are from the gui, updates when needed
+	 */
 	public ServerCode(JTextArea j){
 		ServerCode.chatWindow=j;
         clients=new ArrayList<ClientHolder>();
 	}
-
+	/**
+	 * This method starts the server
+	 * SetConnection Thread is created to listen to clients trying to connect
+	 * another Thread is created inside SetConnection to listen to every client's messages
+	 */
 	public void startRunning(){
 
 		try{

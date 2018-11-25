@@ -9,7 +9,12 @@ import java.util.Iterator;
 
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
-
+/**
+ * This class is used a Thread to listen to every client's messages separately
+ * Every time a new client joins a new Thread of this type is created
+ * @author David
+ *
+ */
 public class ConnectionListner implements Runnable {
 	protected Socket clientSocket = null;
 	private ObjectOutputStream output;				//can change to send to different clients
@@ -18,7 +23,15 @@ public class ConnectionListner implements Runnable {
 	private JTextArea chatWindow;
 	private ArrayList<ClientHolder>clients;
 	private String name;
-
+	/**
+	 * 
+	 * @param name	The clients name
+	 * @param chatWindow	The text area from the gui
+	 * @param clientSocket	The socket connecting the server and the client
+	 * @param input		Established input stream
+	 * @param output	Established output stream
+	 * @param clients	List of all connected clients of type ClientHolder, each containing the client's name and output stream
+	 */
 	public ConnectionListner(String name, JTextArea chatWindow, Socket clientSocket, ObjectInputStream input,ObjectOutputStream output,ArrayList<ClientHolder>clients) {
 		this.clientSocket = clientSocket;
 		this.chatWindow=chatWindow;
@@ -28,7 +41,10 @@ public class ConnectionListner implements Runnable {
 		this.clients=clients;
 		this.name=name;
 	}
-
+	/**
+	 * This method implementing the run() method for the Thread.
+	 * Once called, starts listening to this client's messages
+	 */
 	public void run() {
 		try {
 			while(true) {
@@ -38,10 +54,13 @@ public class ConnectionListner implements Runnable {
 			e.printStackTrace();
 		}
 		finally {
-			disconnect();
+			disconnect();	//when disconnected for any reason
 		}
 	}
-	//update chatWindow
+	/**
+	 * update chatWindow
+	 * @param text	The text we want to add
+	 */
 	private void showMessage(final String text){
 		SwingUtilities.invokeLater(
 				new Runnable(){
@@ -51,6 +70,14 @@ public class ConnectionListner implements Runnable {
 				}
 				);
 	}
+	/**
+	 * First notifies everyone that it joined and starts listening to this client's messages
+	 * When a message is received, first checks if it says "showconnected" which send to 
+	 * this client all of the names of the connected users and. 
+	 * Or if it says "disconnect" which disconnect this client from the server.
+	 * Then always looks for '&' separating the destination and the message and sends it only to the relevant clients
+	 * @throws IOException
+	 */
 	private void whileChatting() throws IOException{
 
 		String message = " is now connected! ";
@@ -69,9 +96,13 @@ public class ConnectionListner implements Runnable {
 			}catch(ClassNotFoundException classNotFoundException){
 				showMessage("The user has sent an unknown object!");
 			}
-		}while(!message.equals("CLIENT - END"));
+		}while(true);
 	}
-
+	/**
+	 * Sends a message to client "dest"
+	 * @param message	The message
+	 * @param dest The client you want to message
+	 */
 	private void sendMessage(String message,String dest){
 
 		Iterator<ClientHolder>it=clients.iterator();
@@ -124,7 +155,9 @@ public class ConnectionListner implements Runnable {
 			}
 		}
 	}
-	//closes the sockets and streams
+	/**
+	 * closes the sockets and streams
+	 */
 	private void closeConnection(){
 		showMessage(name+ " left!");
 		try{
@@ -136,7 +169,9 @@ public class ConnectionListner implements Runnable {
 		}
 	}
 	
-	// prints all the online clients to this client
+	/**
+	 * Prints all the online clients to this client
+	 */
 	private void showOnline() {
 		Iterator<ClientHolder>it=clients.iterator();
 		ClientHolder show;
@@ -163,7 +198,9 @@ public class ConnectionListner implements Runnable {
 			}
 		}
 	}
-	//closes the connection and notifies everyone this client left
+	/**
+	 * closes the connection and notifies everyone this client left
+	 */
 	private void disconnect() {
 		sendMessage(name+" left!","All");
 		Iterator<ClientHolder>it2=clients.iterator();

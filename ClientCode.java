@@ -48,7 +48,7 @@ public class ClientCode extends JFrame{
 		connectToServer();
 		setupStreams();
 		sendNameToServer();
-		new Thread(new ClientListner(dst,input,output,chatWindow,connection)).start();
+		new Thread(new ClientListner(input,output,chatWindow,connection)).start();
 	}
 
 	/**
