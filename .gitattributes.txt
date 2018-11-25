@@ -1,3 +1,0 @@
-.$ cat .gitattributes
-project-docs/* linguist-documentation
-JavaDoc/* linguist-language=java
